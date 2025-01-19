@@ -150,4 +150,114 @@ public class DefaultTeam {
  
     return CERCLE;
   }
+  
+  public int calculeHeron(int a, int b, int c) {
+	  int s= (a+b+c)/2;
+	  
+	  return (int)Math.sqrt(s*(s-a)*(s-b)*(s-c));
+  }
+  static boolean ontMemeSigne(int x, int y) {
+      return (x ^ y) >= 0; // XOR des bits de signe
+  }
+  
+  public Boolean produitVectoriel(Point A, Point B, Point C, Point X) {
+	  Vecteur AB= new Vecteur();
+	  AB.x= B.x-A.x;
+	  AB.y=B.y-A.y;
+	  
+	  Vecteur BA= new Vecteur();
+	  BA.x= A.x-B.x;
+	  BA.y=A.y-B.y;
+	  
+	  Vecteur BC= new Vecteur();
+	  BC.x= B.x-C.x;
+	  BC.y=B.y-C.y;
+	  
+	  Vecteur AC= new Vecteur();
+	  AC.x= C.x-A.x;
+	  AC.y=C.y-A.y;
+	  
+	  Vecteur AX= new Vecteur();
+	  AX.x= X.x-A.x;
+	  AX.y=X.y-A.y;
+	  
+	  Vecteur BX= new Vecteur();
+	  BX.x= X.x-B.x;
+	  BX.y=X.y-B.y;
+	  
+	  Vecteur AB_AX= new Vecteur();
+	  AB_AX.z= AB.x * AX.y - AB.y * AX.x;
+	  
+	  Vecteur AB_AC= new Vecteur();
+	  AB_AC.z= AB.x * AC.y - AB.y * AC.x;
+	  
+	  Vecteur BC_BX= new Vecteur();
+	  BC_BX.z= BC.x * BX.y - BC.y * BX.x;
+	  
+	  Vecteur BC_BA= new Vecteur();
+	  BC_BA.z= BC.x * BA.y - BC.y * BA.x;
+	  
+	  Vecteur AC_AX= new Vecteur();
+	  AC_AX.z= AC.x * AX.y - AC.y * AX.x;
+	  
+	  Vecteur AC_AB= new Vecteur();
+	  AC_AB.z= AC.x * AB.y - AC.y * AB.x;
+	  
+	  if (  ontMemeSigne(AB_AX.z,AB_AC.z) && ontMemeSigne(BC_BX.z,BC_BA.z) && ontMemeSigne(AC_AX.z,AC_AB.z)   ) {
+		  return true;
+	  }
+	  
+	  return false;
+  }
+  
+  
+  
+  public boolean barycentrique(Point A, Point B, Point C, Point X) {
+	  int d =( (B.y - C.y) * (A.x-C.x) + (C.x - B.x) *(A.y-C.y)    );
+	  int l1 = (  (B.y-C.y) * (X.x-C.x) +(C.x-B.x)*(X.y-C.y)     ) / d;
+	  int l2=  (  (C.y-A.y) * (X.x-C.x) +(A.x-C.x)*(X.y-C.y)     ) / d;
+	  int l3= 1-l1-l2;
+	  return  (l1 >= 0 && l1 <= 1) && (l2 >= 0 && l2 <= 1) && (l3 >= 0 && l3 <= 1);
+  }
+  
+  
+  public boolean Akl_toussaint_heron(ArrayList<Point> pList,Point X) {
+	  
+	  Point A=pList.get(0);
+	  Point B= pList.get(1);
+	  Point C=pList.get(2);
+	  Point D=pList.get(3);
+	  
+	  int AB=(int) distancePoint(A,B);
+	  int BC=(int) distancePoint(B,C);
+	  int AC=(int) distancePoint(A,C);
+	  int BX=(int) distancePoint(B,X);
+	  int CX=(int) distancePoint(C,X);
+	  int AX= (int) distancePoint(A,X);
+	  //Triangle ABX
+	  int airABX= calculeHeron(AB,BX,AX);
+	  //Triangle BCX
+	  int airBCX= calculeHeron(BC,CX,BX);
+	  //Triangle ACX
+	  int airACX= calculeHeron(AC,CX,AX);
+	  //Triangle ABC
+	  int airABC= calculeHeron(AB,BC,AC);
+	  
+	  if ((airABX+airBCX+airACX)==airABC) {
+		  return true;
+	  }
+	  
+	  
+	  
+	  
+	  return false;
+  }
+  class Vecteur{
+	  int x;
+	  int y;
+	  int z;
+	  
+  }
+  
+  
 }
