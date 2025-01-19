@@ -117,29 +117,9 @@ public class DefaultTeam {
      *******************/
     ArrayList<Point> copy = new ArrayList<>(points);
     // Exercice 05
-    Random rand = new Random();
-    int min = 0, max = points.size()-1;
-    int randomInt = rand.nextInt(max - min+1) + min;
-    Point dummy= points.get(randomInt);
-    int maxDistanceDummy=0;
-    Point P= null;
-    for(Point p : points) {
-    	int newD= (int) distancePoint(dummy,p);
-    	if (maxDistanceDummy < newD) {
-    		maxDistanceDummy=newD;
-    		P = p;
-    	}
-    	
-    }
-    int maxDistanceP=0;
-    Point Q=null;
-    for(Point q: points) {
-    	int newD= (int) distancePoint(P,q);
-    	if (maxDistanceP < newD) {
-    		maxDistanceP=newD;
-    		Q = q;
-    	}
-    }
+    Line line = calculDiametre(copy);
+    Point P = line.getP();
+    Point Q = line.getQ();
     
     Point C= findCenter(P,Q);
     Circle CERCLE= new Circle(C,(int) distancePoint(C,P));
