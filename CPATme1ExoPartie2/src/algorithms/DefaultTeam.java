@@ -2,6 +2,8 @@ package algorithms;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Random;
 
 /***************************************************************
  * TME 1: calcul de diamètre et de cercle couvrant minimum.    *
@@ -93,6 +95,12 @@ public class DefaultTeam {
       return new Circle(centre, rayon);
   }
 
+  public Point findCenter(Point p1, Point p2) {
+      int centreX = (p1.x + p2.x) / 2;
+      int centreY = (p1.y + p2.y) / 2;
+      return new Point(centreX,centreY);
+  }
+
   // calculCercleMin: ArrayList<Point> --> Circle
   //   renvoie un cercle couvrant tout point de la liste, de rayon minimum.
   public Circle calculCercleMin(ArrayList<Point> points) {
@@ -100,60 +108,66 @@ public class DefaultTeam {
       return null;
     }
     
-    // Si le premier cercle crée ayant pour diamètre la taille du segment entre les deux points les plus éloignés est crée
-    // Et contient tous les autres points, alors c'est le cercle de rayon minimal et on peut arrêter de chercher.
-    
+
     Point center=points.get(0);
     int radius=100;
-    
-    int compteur = 0;
-    System.out.println("Size of points array : " + points.size());
 
-    for (Point p : points) {
-		compteur++;
-    	for (Point q : points) {
-    		center = new Point((p.x + q.x)/2, (p.y + q.y)/2);
-    		radius = (int) (distancePoint(p, q)/2);
-    		for (Point c : points) {
-    			if (! isPointInCircled(center, radius, c)) {
-    				break;
-    			}
-    			else if (c.equals(points.get(points.size() - 1))) {
-    				System.out.println("Fin cercle min - simple - nb itération = " + compteur);
-    				return new Circle(center,radius);
-    			}
-    		}
-    		compteur = 0;
+    /*******************
+     * PARTIE A ECRIRE *
+     *******************/
+    ArrayList<Point> copy = new ArrayList<>(points);
+    // Exercice 05
+    Random rand = new Random();
+    int min = 0, max = points.size()-1;
+    int randomInt = rand.nextInt(max - min+1) + min;
+    Point dummy= points.get(randomInt);
+    int maxDistanceDummy=0;
+    Point P= null;
+    for(Point p : points) {
+    	int newD= (int) distancePoint(dummy,p);
+    	if (maxDistanceDummy < newD) {
+    		maxDistanceDummy=newD;
+    		P = p;
+    	}
+    	
+    }
+    int maxDistanceP=0;
+    Point Q=null;
+    for(Point q: points) {
+    	int newD= (int) distancePoint(P,q);
+    	if (maxDistanceP < newD) {
+    		maxDistanceP=newD;
+    		Q = q;
     	}
     }
     
-    // Sinon, on doit chercher un cercle circonscrit parmis vérifiant cette propriété parmis tous les trios possible de points
-    compteur = 0;
-    for (Point p : points) {
-    	compteur++;
-    	System.out.println("Compteur : " + compteur);
-    	for (Point q : points) {
-    		for (Point r : points) {
-    			Circle m = genererCercleCirconscrit(p, q, r);
-    			if (m == null) {
-    				continue;
-    			}
-    			center = m.getCenter();
-    			radius = m.getRadius();
-        		for (Point c : points) {
-        			if (! isPointInCircled(center, radius, c)) {
-        				break;
-        			}
-        			else if (c.equals(points.get(points.size() - 1))) {
-        				System.out.println("Fin cercle min - hard");
-        				System.out.println("Radius : " + radius);
-        				System.out.println("Coordonnées centre : " + center);
-        				return new Circle(center,radius);
-        			}
-        		}
-    		}
-    	}
+    Point C= findCenter(P,Q);
+    Circle CERCLE= new Circle(C,(int) distancePoint(C,P));
+    points.remove(P);
+    points.remove(Q);
+    Iterator<Point> iter = copy.iterator();
+   
+    while (iter.hasNext()) {
+        Point S = iter.next();
+        if ((int) distancePoint(C,S) <= CERCLE.getRadius()) {
+            iter.remove(); 
+        }else {
+        	
+        	int d = (int) distancePoint(C,S);
+        	int Tx = C.x - (CERCLE.getRadius()) * (S.x - C.x) / d;
+        	int Ty = C.y - (CERCLE.getRadius()) * (S.y - C.y) / d;
+        
+            Point T= new Point(Tx,Ty);
+            Point newC=  findCenter(T,S);
+            C=newC;
+            
+            int l= (int) distancePoint(C,T);
+            CERCLE= new Circle(C,l);
+         
+        }
     }
-    return new Circle(center,radius);
+
+ 
+    return CERCLE;
   }
 }
