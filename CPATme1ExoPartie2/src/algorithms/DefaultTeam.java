@@ -220,13 +220,60 @@ public class DefaultTeam {
 	  return  (l1 >= 0 && l1 <= 1) && (l2 >= 0 && l2 <= 1) && (l3 >= 0 && l3 <= 1);
   }
   
-  
-  public boolean Akl_toussaint_heron(ArrayList<Point> pList,Point X) {
+  public Point[] Akl_tooussaint_heron_points(ArrayList<Point> pList) {
+	  // Recherche du point avec l'abscisse minimal : A
+	  Point A = pList.get(0);
+	  for (Point other : pList) {
+		  if (A.x <= other.x) {
+			  continue;
+		  }
+		  else {
+			  A = other;
+		  }
+	  }
 	  
-	  Point A=pList.get(0);
-	  Point B= pList.get(1);
-	  Point C=pList.get(2);
-	  Point D=pList.get(3);
+	  // Recherche du point avec lordonéee minimal : B
+	  Point B = pList.get(0);
+	  for (Point other : pList) {
+		  if (B.y <= other.y) {
+			  continue;
+		  }
+		  else {
+			  B = other;
+		  }
+	  }
+	  
+	  // Recherche du point avec l'abscisse maximale : C
+	  Point C = pList.get(0);
+	  for (Point other : pList) {
+		  if (C.x >= other.x) {
+			  continue;
+		  }
+		  else {
+			  C = other;
+		  }
+	  }
+	  
+	  // Recherche du point avec l'ordonnée maximale : D
+	  Point D = pList.get(0);
+	  for (Point other : pList) {
+		  if (D.y >= other.y) {
+			  continue;
+		  }
+		  else {
+			  D = other;
+		  }
+	  }
+		  
+	  return new Point[] {A,B,C,D};
+  }
+  
+  
+  public boolean Akl_toussaint_heron(Point[] points,Point X) {	  
+	  Point A=points[0];
+	  Point B=points[1];
+	  Point C=points[2];
+	  Point D=points[3];
 	  
 	  int AB=(int) distancePoint(A,B);
 	  int BC=(int) distancePoint(B,C);
@@ -246,18 +293,37 @@ public class DefaultTeam {
 	  if ((airABX+airBCX+airACX)==airABC) {
 		  return true;
 	  }
-	  
-	  
-	  
-	  
 	  return false;
   }
   class Vecteur{
 	  int x;
 	  int y;
 	  int z;
-	  
   }
   
+  // supprime de la liste de points passé en argument tous les points appartenant au quadrilataire de toussaint_heron
+  public void filtrage_AKL_toussaint(ArrayList<Point> pList) {	
+	 
+	  Point ABCD[] = Akl_tooussaint_heron_points(pList);
+	  
+	  Boolean flag = false; // Flag pour au cas où on tombe sur un point constituant le rectangle -> fait faire un continue dans la boucle principale
+	  
+	  for (int j=0; j<pList.size(); j++) {
+		  Point x = pList.get(j);
+		  for (int i=0; i<4; i++) { // On vérifie si le points n'appartient pas au côté de ABCD
+			  if (x == ABCD[i]) {
+				  flag = true;
+				  break;
+			  }
+		  }
+		  if (flag) {
+			  flag = false;
+			  continue;
+		  }
+		  if (Akl_toussaint_heron(ABCD,x)) { // On vérifie pour chacun des points s'il est dans le rectangle
+			  pList.remove(j);
+		  }
+	  }
+  }
   
 }
